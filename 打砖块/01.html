@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		#id-canvas {
+			border: 2px double #000;
+		}
+		.border {
+			position: absolute;
+			top: 10px;
+			left: 320px;
+			width: 90px;
+			height: 40px;
+			background-image: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%);
+
+		}
+		.border p {
+			text-align: center;
+			top: 0;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="id-canvas" width="400px" height="600px"></canvas>
+	<div class='border'>
+		<p>0</p>
+	</div>
+	<script>
+	var p = document.querySelector('p')
+	var score = 0;
+	log = console.log.bind(console)
+	var game = function () {
+		var g = {
+			action: {},
+			keydown: {},
+		}
+
+		let canvas = document.getElementById("id-canvas")
+    	let ctx = canvas.getContext("2d");
+    	g.canvas =canvas;
+    	g.ctx = ctx
+    	window.addEventListener('keydown',function(e){
+    		g.keydown[e.key] = true
+    	})
+    	window.addEventListener('keyup',function(e){
+    		g.keydown[e.key] = false
+    	})
+    	g.registerAction = function (key,callback) {
+    		g.action[key] = callback
+    	}
+    	setInterval(function(){
+    		var action = Object.keys(g.action)
+    		for (var i = 0; i < action.length; i++) {
+    			var key = action[i] 
+    			if(g.keydown[key]) {
+    				g.action[key]()
+    			}
+    		}
+    		g.update()
+	    	g.draw()
+    	},1000/30)
+    	return g
+	}
+	var imgFrom = function (path) {
+		var img = new Image()
+    	img.src = path
+    	return img
+	}
+	var Ball = function () {
+		var img = imgFrom('2.png')
+		var o = {
+			image: img,
+			x: 100,
+			y: 350,
+			speedX: 10,
+			speedY: 10,
+			fired: false,
+		}
+		o.move  = function	() {
+			if (o.fired) {
+				if(o.x < 0 || o.x >320){
+					o.speedX = -o.speedX
+				}
+				if(o.y < 0 || o.y > 520){
+					o.speedY = -o.speedY
+				}
+				o.x += o.speedX
+				o.y += o.speedY
+				score++
+			}
+
+		}
+		o.fire = function () {
+			o.fired = true
+		}
+		o.image.width = 75
+		o.image.height = 75
+		return	o
+	}
+	var Mold = function () {
+		var img1 = imgFrom('1.png')
+		var o = {
+			image: img1,
+			x: 100,
+			y: 500,
+			speed: 15,
+			moveLeft: function () {
+				if(o.x>= 0){
+					o.x -= o.speed
+				}
+			},
+			moveRight: function () {
+				if(o.x<=243){
+					o.x += o.speed
+				}
+			},
+			moveUP: function () {
+				if (o.y>=0) {
+					o.y -= o.speed
+				}
+			},
+			moveDown: function () {
+				if (o.y<=568) {
+					o.y += o.speed
+				}
+			},
+			collide: function (ball) {
+				if (ball.y + ball.image.height >o.y) {
+					if (ball.x > o.x && ball.x < o.x + o.image.width){
+						score += 100
+						return false
+					}
+				}
+				return true
+			}
+		}
+		o.image.width = 100
+		o.image.height = 30
+
+		return o
+	}
+    var main = function () {
+		let g = game()
+    	let a  = Mold()
+    	let ball = Ball()
+    	g.draw = function() {
+    		g.ctx.clearRect(0, 0, g.canvas.width, g.canvas.height)
+			g.ctx.drawImage(a.image,a.x,a.y)
+			g.ctx.drawImage(ball.image,ball.x,ball.y)	
+    	}
+    	g.update = function () {
+    		ball.move()
+    		p.innerHTML = score
+    		if (!a.collide(ball)) {
+    			ball.speedY *= -1
+    		}
+    		if(ball.y>510){
+    			ball.x = 100
+    			ball.y = 350
+    			a.x = 100
+    			a.y = 500
+    			ball.fired = false
+    			alert(`游戏结束,你的得分为${p.innerHTML-1}`)
+    			score = 0
+    		}
+    		
+    	}
+
+    	g.registerAction('a',function(){
+    		a.moveLeft()
+    	})
+    	g.registerAction('d',function(){
+    		a.moveRight()
+    	})
+    	/*g.registerAction('w',function(){
+    		a.moveUP()
+    	})
+    	g.registerAction('s',function(){
+    		a.moveDown()
+    	})*/
+    	g.registerAction(' ',function(){
+    		ball.fire()
+    	})
+    }
+    main()
+</script>
+</body>
+
+</html>
