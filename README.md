@@ -3,6 +3,7 @@
 
 ----
 ## 项目包括
+
 1. 满屏的圆进行移动  当鼠标经过，一定直径内，园的半径变大。
 2. canvas 上重力效果gravity 的实现
 3. 未完成版的搞笑打砖块
@@ -10,3 +11,4 @@
 5. flappy bird 的js实现
 6. tetris 俄罗斯方块，项目逻辑很多，判定很多。
 
+![演示](https://github.com/vivipure/canvas_game/blob/master/demonstrate.png)
